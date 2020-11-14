@@ -87,7 +87,7 @@ public class OpenAddressingHashTable<T>{
 
         private int index = 0;
         private int iterations = 0;
-        Object current;
+        private Object current;
 
         public boolean hasNext() {
             return iterations < size;
