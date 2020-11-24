@@ -2,25 +2,36 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 public class OpenAddressingHashTable<T>{
-    private final int bits;
 
     private final int capacity;
+
+    private final float loadFactor;
 
     private final Object[] storage;
 
     private int size = 0;
 
-    private int startingIndex(Object element) {
-        return element.hashCode() & (0x7FFFFFFF >> (31 - bits));
+    private int hash(Object element) {
+        int code = element.hashCode();
+        if (code >= 0 ) return code % storage.length;
+        else return storage.length - Math.abs(code) % storage.length;
     }
 
-    public OpenAddressingHashTable(int bits) {
-        if (bits < 2 || bits > 31) {
-            throw new IllegalArgumentException();
-        }
-        this.bits = bits;
-        capacity = 1 << bits;
-        storage = new Object[capacity];
+    public OpenAddressingHashTable(int capacity, float loadFactor) {
+        this.capacity = capacity;
+        this.loadFactor = loadFactor;
+        this.storage = new Object[(int) (capacity * loadFactor)];
+    }
+    public OpenAddressingHashTable(int capacity) {
+        this(capacity, 0.75F);
+    }
+
+    public OpenAddressingHashTable(float loadFactor) {
+        this(16, loadFactor);
+    }
+
+    public OpenAddressingHashTable() {
+        this(16, 0.75F);
     }
 
     private final Object removed = new Object();
@@ -30,41 +41,45 @@ public class OpenAddressingHashTable<T>{
     }
 
     public boolean contains(Object o) {
-        int startingIndex = startingIndex(o);
+        int startingIndex = hash(o);
         int index = startingIndex;
         Object current = storage[index];
         while (current != null) {
             if (current.equals(o)) {
                 return true;
             }
-            index = (index + 1) % capacity;
+            index = (index + 1) % storage.length;
             if (index == startingIndex) break;
             current = storage[index];
         }
         return false;
     }
 
-    public boolean add(T t) {
-        int startingIndex = startingIndex(t);
+    public boolean add(Object o) {
+        int startingIndex = hash(o);
         int index = startingIndex;
         Object current = storage[index];
         while (current != null && current != removed) {
-            if (current.equals(t)) {
+            if (current.equals(o)) {
                 return false;
             }
-            index = (index + 1) % capacity;
+            index = (index + 1) % storage.length;
             if (index == startingIndex) {
                 throw new IllegalStateException("Table is full");
             }
             current = storage[index];
         }
-        storage[index] = t;
+        storage[index] = o;
         size++;
         return true;
     }
 
+    private void resize() {
+        Object[] newStorage = new Object[this.storage.length * 2];
+    }
+
     public boolean remove(Object o) {
-        int startingIndex = startingIndex(o);
+        int startingIndex = hash(o);
         int index = startingIndex;
         Object current = storage[index];
         while (current != null) {
@@ -73,7 +88,7 @@ public class OpenAddressingHashTable<T>{
                 size--;
                 return true;
             }
-            index = (index + 1) % capacity;
+            index = (index + 1) % storage.length;
             if (index == startingIndex) break;
             current = storage[index];
         }
