@@ -64,7 +64,7 @@ public class OpenAddressingHashTable<T>{
                 return false;
             }
             index = (index + 1) % storage.length;
-            if (index == startingIndex) {
+            if (index == startingIndex) { // здесь должен быть resize()
                 throw new IllegalStateException("Table is full");
             }
             current = storage[index];
