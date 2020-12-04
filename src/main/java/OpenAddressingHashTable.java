@@ -1,12 +1,10 @@
 
 import java.util.Iterator;
-import java.util.Map;
 import java.util.NoSuchElementException;
-
 
 public class OpenAddressingHashTable<T> {
 
-    private final int capacity;
+    private int capacity;
 
     private final float loadFactor;
 
@@ -82,6 +80,7 @@ public class OpenAddressingHashTable<T> {
         for (Object element: oldStorage) {
             storage[hash(element)] = element;
         }
+        capacity *= 2;
     }
 
     public boolean remove(Object o) {
