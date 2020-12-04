@@ -1,13 +1,16 @@
+
 import java.util.Iterator;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
-public class OpenAddressingHashTable<T>{
+
+public class OpenAddressingHashTable<T> {
 
     private final int capacity;
 
     private final float loadFactor;
 
-    private final Object[] storage;
+    private Object[] storage;
 
     private int size = 0;
 
@@ -20,7 +23,7 @@ public class OpenAddressingHashTable<T>{
     public OpenAddressingHashTable(int capacity, float loadFactor) {
         this.capacity = capacity;
         this.loadFactor = loadFactor;
-        this.storage = new Object[(int) (capacity * loadFactor)];
+        this.storage = new Object[capacity];
     }
     public OpenAddressingHashTable(int capacity) {
         this(capacity, 0.75F);
@@ -56,17 +59,14 @@ public class OpenAddressingHashTable<T>{
     }
 
     public boolean add(Object o) {
-        int startingIndex = hash(o);
-        int index = startingIndex;
+        if ((int) (capacity * loadFactor) == size) resize();
+        int index = hash(o);
         Object current = storage[index];
         while (current != null && current != removed) {
             if (current.equals(o)) {
                 return false;
             }
             index = (index + 1) % storage.length;
-            if (index == startingIndex) { // здесь должен быть resize()
-                throw new IllegalStateException("Table is full");
-            }
             current = storage[index];
         }
         storage[index] = o;
@@ -75,7 +75,13 @@ public class OpenAddressingHashTable<T>{
     }
 
     private void resize() {
-        Object[] newStorage = new Object[this.storage.length * 2];
+        if (capacity == Integer.MAX_VALUE)
+            throw new IllegalStateException("Table size can't be more than max value of integer");
+        Object[] oldStorage = storage;
+        storage = new Object[oldStorage.length * 2];
+        for (Object element: oldStorage) {
+            storage[hash(element)] = element;
+        }
     }
 
     public boolean remove(Object o) {
