@@ -24,6 +24,7 @@ public class OpenAddressingHashTable<T> {
         this.loadFactor = loadFactor;
         this.storage = (T[]) new Object[capacity];
     }
+
     public OpenAddressingHashTable(int capacity) {
         this(capacity, 0.75F);
     }
@@ -70,9 +71,10 @@ public class OpenAddressingHashTable<T> {
         size++;
         return true;
     }
+
     @SuppressWarnings("unchecked")
     private void resize() {
-        if (capacity == Integer.MAX_VALUE)
+        if (capacity >= Integer.MAX_VALUE)
             throw new IllegalStateException("Table size can't be more than max value of integer");
         T[] oldStorage = storage;
         capacity *= 2;
@@ -105,7 +107,6 @@ public class OpenAddressingHashTable<T> {
         }
         return false;
     }
-
 
     public Iterator<T> iterator() { return new OpenAddressingHashTableIterator();}
 
