@@ -4,11 +4,11 @@ import java.util.NoSuchElementException;
 
 public class OpenAddressingHashTable<T> {
 
-    public int capacity;
+    private int capacity;
 
     private final float loadFactor;
 
-    private Object[] storage;
+    private T[] storage;
 
     private int size = 0;
 
@@ -18,10 +18,11 @@ public class OpenAddressingHashTable<T> {
         else return (capacity - 1) - (Math.abs(code) % capacity);
     }
 
+    @SuppressWarnings("unchecked")
     public OpenAddressingHashTable(int capacity, float loadFactor) {
         this.capacity = capacity;
         this.loadFactor = loadFactor;
-        this.storage = new Object[capacity];
+        this.storage = (T[]) new Object[capacity];
     }
     public OpenAddressingHashTable(int capacity) {
         this(capacity, 0.75F);
@@ -35,8 +36,6 @@ public class OpenAddressingHashTable<T> {
         this(16, 0.75F);
     }
 
-    private final Object removed = new Object();
-
     public int size() {
         return size;
     }
@@ -44,12 +43,12 @@ public class OpenAddressingHashTable<T> {
     public boolean contains(T t) {
         int startingIndex = hash(t);
         int index = startingIndex;
-        Object current = storage[index];
+        T current = storage[index];
         while (current != null) {
             if (current.equals(t)) {
                 return true;
             }
-            index = (index + 1) % storage.length;
+            index = (index + 1) % capacity;
             if (index == startingIndex) break;
             current = storage[index];
         }
@@ -59,12 +58,12 @@ public class OpenAddressingHashTable<T> {
     public boolean add(T t) {
         if (size == (int) (capacity * loadFactor)) resize();
         int index = hash(t);
-        Object current = storage[index];
+        T current = storage[index];
         while (current != null && current != removed) {
             if (current.equals(t)) {
                 return false;
             }
-            index = (index + 1) % storage.length;
+            index = (index + 1) % capacity;
             current = storage[index];
         }
         storage[index] = t;
@@ -75,26 +74,32 @@ public class OpenAddressingHashTable<T> {
     private void resize() {
         if (capacity == Integer.MAX_VALUE)
             throw new IllegalStateException("Table size can't be more than max value of integer");
-        Object[] oldStorage = storage;
+        T[] oldStorage = storage;
         capacity *= 2;
-        storage = new Object[capacity];
-        size = 0;
-        for (Object element: oldStorage) {
-            if (element != null) this.add((T) element);
+        storage = (T[]) new Object[capacity];
+        for (T t: oldStorage) {
+            if (t != null) {
+                int index = hash(t);
+                while (storage[index] != null)
+                    index = (index + 1) % capacity;
+                storage[index] = t;
+            }
         }
     }
+    @SuppressWarnings("unchecked")
+    private final T removed = (T) new Object();
 
     public boolean remove(T t) {
         int startingIndex = hash(t);
         int index = startingIndex;
-        Object current = storage[index];
+        T current = storage[index];
         while (current != null) {
             if (current.equals(t)) {
                 storage[index] = removed;
                 size--;
                 return true;
             }
-            index = (index + 1) % storage.length;
+            index = (index + 1) % capacity;
             if (index == startingIndex) break;
             current = storage[index];
         }
@@ -114,11 +119,10 @@ public class OpenAddressingHashTable<T> {
             return iterations < size;
         }
 
-        @SuppressWarnings("unchecked")
         public T next() {
             if (hasNext()) {
                 while (storage[index] == null || storage[index] == removed) index++;
-                current = (T) storage[index];
+                current = storage[index];
                 index++;
                 iterations++;
                 return current;
