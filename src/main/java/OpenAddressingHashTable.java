@@ -74,10 +74,10 @@ public class OpenAddressingHashTable<T> {
 
     @SuppressWarnings("unchecked")
     private void resize() {
-        if (capacity >= Integer.MAX_VALUE)
-            throw new IllegalStateException("Table size can't be more than max value of integer");
-        T[] oldStorage = storage;
         capacity *= 2;
+        if (capacity <= 0)
+            throw new IllegalStateException("Table capacity can't be more than max value of integer");
+        T[] oldStorage = storage;
         storage = (T[]) new Object[capacity];
         for (T t: oldStorage) {
             if (t != null) {
