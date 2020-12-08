@@ -38,18 +38,19 @@ public class ClosedAddressingHashTable<T> {
     }
 
     public boolean contains(T t) {
-        return storage[hash(t)].contains(t);
+        LinkedList<T> current = storage[hash(t)];
+        return current != null && current.contains(t);
     }
 
     public boolean add(T t) {
         if (size == (int) (capacity * loadFactor)) resize();
         int index = hash(t);
-        if (storage[index] == null) {
+        LinkedList<T> current = storage[index];
+        if (current == null) {
             storage[index] = new LinkedList<>();
             storage[index].add(t);
         }
-        else if (!storage[index].contains(t))
-            storage[index].add(t);
+        else if (!current.contains(t)) storage[index].add(t);
         else return false;
         size++;
         return true;
@@ -66,11 +67,17 @@ public class ClosedAddressingHashTable<T> {
             if (list != null)
                 for (T t : list) {
                 int index = hash(t);
-                if (storage[index] == null)
-                    storage[index] = new LinkedList<>();
+                if (storage[index] == null) storage[index] = new LinkedList<>();
                 storage[index].add(t);
             }
     }
 
-    //public boolean remove(T t) {}
+    public boolean remove(T t) {
+        int index = hash(t);
+        if (storage[index] != null && storage[index].remove(t)) {
+            size--;
+            return true;
+        }
+        else return false;
+    }
 }

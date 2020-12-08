@@ -15,24 +15,28 @@ public class OpenAddressingTest {
             int size = 0;
             List<Integer> added = new ArrayList<>();
             for (int i = 0; i < elements; i++) {
-                int r = random.nextInt(bound);
+                Integer r = random.nextInt(bound);
                 if (table.add(r)) {
-                    size++;
                     added.add(r);
+                    size++;
                 }
             }
             Assertions.assertEquals(size, table.size());
+            Assertions.assertEquals(added.size(), table.size());
             for (Integer i: added) Assertions.assertTrue(table.contains(i));
             List<Integer> removed = new ArrayList<>();
             for (int i = 0; i < elements; i++) {
-                int r = random.nextInt(bound);
+                Integer r = random.nextInt(bound);
                 if (table.remove(r)) {
                     size--;
                     removed.add(r);
+                    added.remove(r);
                 }
             }
             Assertions.assertEquals(size, table.size());
+            Assertions.assertEquals(added.size(), table.size());
             for (Integer i: removed) Assertions.assertFalse(table.contains(i));
+            for (Integer i: added) Assertions.assertTrue(table.contains(i));
         }
     }
 
