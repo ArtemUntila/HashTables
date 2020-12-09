@@ -161,8 +161,9 @@ public class OpenAddressingHashTable<T> implements Set<T> {
     public Object[] toArray() {
         Object[] array = new Object[size];
         int index = 0;
-        while (iterator().hasNext()) {
-            array[index] = iterator().next();
+        Iterator<T> iter = iterator();
+        while (iter.hasNext()) {
+            array[index] = iter.next();
             index++;
         }
         return array;

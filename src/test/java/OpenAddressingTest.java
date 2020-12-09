@@ -79,12 +79,17 @@ public class OpenAddressingTest {
             Assertions.assertTrue(table.addAll(list));
             Assertions.assertTrue(table.containsAll(list));
 
-            Assertions.assertTrue(table.removeAll(list));
-            Assertions.assertTrue(table.isEmpty());
-
             Object[] array = table.toArray();
             Assertions.assertEquals(array.length, table.size());
             for(Object o: array) Assertions.assertTrue(table.contains(o));
+
+            Assertions.assertTrue(table.removeAll(list));
+            for (Integer i: list) Assertions.assertFalse(table.contains(i));
+            Assertions.assertTrue(table.isEmpty());
+
+            Assertions.assertTrue(table.addAll(list));
+            table.clear();
+            Assertions.assertTrue(table.isEmpty());
         }
     }
 
