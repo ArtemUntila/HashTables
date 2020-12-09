@@ -1,6 +1,9 @@
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Set;
 
-public class ClosedAddressingHashTable<T> {
+public class ClosedAddressingHashTable<T> implements Set<T> {
     public int capacity;
 
     private final float loadFactor;
@@ -9,7 +12,7 @@ public class ClosedAddressingHashTable<T> {
 
     private int size = 0;
 
-    private int hash(T element) {
+    private int hash(Object element) {
         int code = element.hashCode();
         if (code >= 0 ) return code % capacity;
         else return (capacity - 1) - (Math.abs(code) % capacity);
@@ -37,9 +40,29 @@ public class ClosedAddressingHashTable<T> {
         return size;
     }
 
-    public boolean contains(T t) {
-        LinkedList<T> current = storage[hash(t)];
-        return current != null && current.contains(t);
+    @Override
+    public boolean isEmpty() {
+        return size == 0;
+    }
+
+    public boolean contains(Object o) {
+        LinkedList<T> current = storage[hash(o)];
+        return current != null && current.contains(o);
+    }
+
+    @Override
+    public Iterator<T> iterator() {
+        return null;
+    }
+
+    @Override
+    public Object[] toArray() {
+        return new Object[0];
+    }
+
+    @Override
+    public <T1> T1[] toArray(T1[] a) {
+        return null;
     }
 
     public boolean add(T t) {
@@ -59,8 +82,7 @@ public class ClosedAddressingHashTable<T> {
     @SuppressWarnings("unchecked")
     private void resize() {
         capacity *= 2;
-        if (capacity <= 0)
-            throw new IllegalStateException("Table capacity can't be more than max value of integer");
+        if (capacity <= 0) throw new IllegalStateException("Table capacity can't be more than max value of integer");
         LinkedList<T>[] oldStorage = storage;
         storage = new LinkedList[capacity];
         for (LinkedList<T> list: oldStorage)
@@ -72,12 +94,37 @@ public class ClosedAddressingHashTable<T> {
             }
     }
 
-    public boolean remove(T t) {
-        int index = hash(t);
-        if (storage[index] != null && storage[index].remove(t)) {
+    public boolean remove(Object o) {
+        int index = hash(o);
+        if (storage[index] != null && storage[index].remove(o)) {
             size--;
             return true;
         }
         else return false;
+    }
+
+    @Override
+    public boolean containsAll(Collection<?> c) {
+        return false;
+    }
+
+    @Override
+    public boolean addAll(Collection<? extends T> c) {
+        return false;
+    }
+
+    @Override
+    public boolean retainAll(Collection<?> c) {
+        return false;
+    }
+
+    @Override
+    public boolean removeAll(Collection<?> c) {
+        return false;
+    }
+
+    @Override
+    public void clear() {
+
     }
 }

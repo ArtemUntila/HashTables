@@ -5,12 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class ClosedAddressingTest {
+public class ClosedAddressingTest<T> {
 
     @Test
     public void mainMethodsTest() {
         ClosedAddressingHashTable<Integer> table = new ClosedAddressingHashTable<>();
-        Assertions.assertFalse(table.contains(5));
         Random random = new Random();
         int size = 0;
         List<Integer> list = new ArrayList<>();
@@ -21,6 +20,9 @@ public class ClosedAddressingTest {
                 list.add(r);
             }
         }
+        table.add(-50);
+        list.add(-50);
+        size++;
         Assertions.assertEquals(size, table.size());
         Assertions.assertEquals(list.size(), table.size());
         for (Integer i: list) Assertions.assertTrue(table.contains(i));
