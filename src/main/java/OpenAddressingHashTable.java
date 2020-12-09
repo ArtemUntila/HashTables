@@ -121,9 +121,7 @@ public class OpenAddressingHashTable<T> implements Set<T> {
     public boolean containsAll(Collection<?> c) {
         if (c.isEmpty()) return false;
         for (Object o : c)
-            if (!this.contains(o)) {
-                return false;
-            }
+            if (!contains(o)) return false;
         return true;
     }
 
@@ -132,24 +130,18 @@ public class OpenAddressingHashTable<T> implements Set<T> {
         boolean changed = false;
         if (!c.isEmpty())
             for (T t : c)
-                if (t != null && this.add(t)) changed = true;
+                if (t != null) changed = add(t);
         return changed;
     }
 
     @Override
     public boolean removeAll(Collection<?> c) {
+        if (c.isEmpty()) return false;
         boolean changed = false;
-        if (!c.isEmpty()) {
-            if (size > c.size()) {
-                for (Object o: c)
-                    if (this.remove(o)) changed = true;
-            } else
-                for (T t: storage)
-                    if (c.contains(t)) {
-                        this.remove(t);
-                        changed = true;
-                    }
-        }
+        if (size > c.size())
+            for (Object o : c)
+                changed = remove(o);
+        else changed = removeIf(c::contains); //use iterator()
         return changed;
     }
 
@@ -174,11 +166,9 @@ public class OpenAddressingHashTable<T> implements Set<T> {
     public Object[] toArray() {
         Object[] array = new Object[size];
         int index = 0;
-        for (T t : storage) {
-            if (t != null && t != removed) {
-                array[index] = t;
-                index++;
-            }
+        while (iterator().hasNext()) {
+            array[index] = iterator().next();
+            index++;
         }
         return array;
     }

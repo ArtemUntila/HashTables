@@ -85,19 +85,9 @@ public class OpenAddressingTest {
             Object[] array = table.toArray();
             Assertions.assertEquals(array.length, table.size());
             for(Object o: array) Assertions.assertTrue(table.contains(o));
-
         }
     }
-   /* @Test
-    public void removeAllTest() {
-        OpenAddressingHashTable<Integer> table = new OpenAddressingHashTable<>();
-        for (int i = 0; i < 100; i++) table.add(i);
-        List<Integer> list = new ArrayList<>();
-        for (int i = 18; i < 100; i += 9) list.add(i);
-        Assertions.assertTrue(table.removeAll(list));
-        for (Integer i: list) Assertions.assertFalse(table.contains(i));
-        Assertions.assertEquals(90, table.size());
-    }*/
+
 
     @Test
     public void doMainMethodsTest() {
@@ -116,5 +106,7 @@ public class OpenAddressingTest {
     @Test
     public void doAdditionalMethodsTest() {
         additionalMethodsTest(10000, 1000, 10);
+        additionalMethodsTest(100000, 1000, 5);
+        additionalMethodsTest(1000000, 2000, 1);
     }
 }
