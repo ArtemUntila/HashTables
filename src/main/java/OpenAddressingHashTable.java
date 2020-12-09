@@ -158,11 +158,6 @@ public class OpenAddressingHashTable<T> implements Set<T> {
     }
 
     @Override
-    public Iterator<T> iterator() {
-        return new OpenAddressingHashTableIterator();
-    }
-
-    @Override
     public Object[] toArray() {
         Object[] array = new Object[size];
         int index = 0;
@@ -176,6 +171,11 @@ public class OpenAddressingHashTable<T> implements Set<T> {
     @Override
     public <T1> T1[] toArray(T1[] a) {
         return null;
+    }
+
+    @Override
+    public Iterator<T> iterator() {
+        return new OpenAddressingHashTableIterator();
     }
 
     public class OpenAddressingHashTableIterator implements Iterator<T> {
