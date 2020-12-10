@@ -49,16 +49,6 @@ public class ClosedAddressingHashTable<T> implements Set<T> {
         return current != null && current.contains(o);
     }
 
-    @Override
-    public Object[] toArray() {
-        return new Object[0];
-    }
-
-    @Override
-    public <T1> T1[] toArray(T1[] a) {
-        return null;
-    }
-
     public boolean add(T t) {
         if (size == (int) (capacity * loadFactor)) resize();
         int index = hash(t);
@@ -100,12 +90,30 @@ public class ClosedAddressingHashTable<T> implements Set<T> {
 
     @Override
     public boolean containsAll(Collection<?> c) {
-        return false;
+        if (c.isEmpty()) return false;
+        for (Object o : c)
+            if (!contains(o)) return false;
+        return true;
     }
 
     @Override
     public boolean addAll(Collection<? extends T> c) {
-        return false;
+        boolean changed = false;
+        if (!c.isEmpty())
+            for (T t : c)
+                if (t != null) changed = add(t);
+        return changed;
+    }
+
+    @Override
+    public boolean removeAll(Collection<?> c) {
+        if (c.isEmpty()) return false;
+        boolean changed = false;
+        if (size > c.size())
+            for (Object o : c)
+                changed = remove(o);
+        else changed = removeIf(c::contains); //use iterator()
+        return changed;
     }
 
     @Override
@@ -113,14 +121,28 @@ public class ClosedAddressingHashTable<T> implements Set<T> {
         return false;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public boolean removeAll(Collection<?> c) {
-        return false;
+    public void clear() {
+        storage = new LinkedList[capacity];
+        size = 0;
     }
 
     @Override
-    public void clear() {
+    public Object[] toArray() {
+        Object[] array = new Object[size];
+        int index = 0;
+        Iterator<T> iter = iterator();
+        while (iter.hasNext()) {
+            array[index] = iter.next();
+            index++;
+        }
+        return array;
+    }
 
+    @Override
+    public <T1> T1[] toArray(T1[] a) {
+        return null;
     }
 
     @Override
@@ -145,7 +167,7 @@ public class ClosedAddressingHashTable<T> implements Set<T> {
             currentList = null;
             iter = null;
             iterations = 0;
-            index = 0;
+            index = -1;
         }
 
         @Override
