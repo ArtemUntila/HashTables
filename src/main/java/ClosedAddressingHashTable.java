@@ -1,6 +1,7 @@
 import java.util.*;
 
 public class ClosedAddressingHashTable<T> implements Set<T> {
+
     public int capacity;
 
     private final float loadFactor;
@@ -43,6 +44,7 @@ public class ClosedAddressingHashTable<T> implements Set<T> {
     }
 
     public boolean contains(Object o) {
+        if (o == null) return false;
         LinkedList<T> current = storage[hash(o)];
         return current != null && current.contains(o);
     }
@@ -87,6 +89,7 @@ public class ClosedAddressingHashTable<T> implements Set<T> {
     }
 
     public boolean remove(Object o) {
+        if (o == null) return false;
         int index = hash(o);
         if (storage[index] != null && storage[index].remove(o)) {
             size--;

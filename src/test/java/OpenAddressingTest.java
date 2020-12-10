@@ -19,6 +19,9 @@ public class OpenAddressingTest {
                     size++;
                 }
             }
+            table.add(-50);
+            added.add(-50);
+            size++;
             Assertions.assertEquals(size, table.size());
             Assertions.assertEquals(added.size(), table.size());
 

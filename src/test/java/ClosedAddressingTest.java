@@ -5,38 +5,43 @@ import java.util.*;
 
 public class ClosedAddressingTest<T> {
 
-    @Test
-    public void mainMethodsTest() {
-        ClosedAddressingHashTable<Integer> table = new ClosedAddressingHashTable<>();
+    public void mainMethodsTest(int elements, int bound, int count) {
         Random random = new Random();
-        int size = 0;
-        List<Integer> list = new ArrayList<>();
-        for (int i = 0; i < 100; i++) {
-            Integer r = random.nextInt(50);
-            if (table.add(r)) {
-                size++;
-                list.add(r);
+        for (int k = 0; k < count; k++) {
+            ClosedAddressingHashTable<Integer> table = new ClosedAddressingHashTable<>();
+            int size = 0;
+            List<Integer> list = new ArrayList<>();
+            for (int i = 0; i < elements; i++) {
+                Integer r = random.nextInt(bound);
+                if (table.add(r)) {
+                    list.add(r);
+                    size++;
+                }
             }
-        }
-        table.add(-50);
-        list.add(-50);
-        size++;
-        Assertions.assertEquals(size, table.size());
-        Assertions.assertEquals(list.size(), table.size());
-        for (Integer i: list) Assertions.assertTrue(table.contains(i));
-        List<Integer> removed = new ArrayList<>();
-        for (int i = 0; i < 100; i++) {
-            Integer r = random.nextInt(50);
-            if (table.remove(r)) {
-                size--;
-                removed.add(r);
-                list.remove(r);
+            table.add(-50);
+            list.add(-50);
+            size++;
+            Assertions.assertEquals(size, table.size());
+            Assertions.assertEquals(list.size(), table.size());
+
+            for (Integer i: list) Assertions.assertTrue(table.contains(i));
+
+            List<Integer> removed = new ArrayList<>();
+            for (int i = 0; i < elements; i++) {
+                Integer r = random.nextInt(bound);
+                if (table.remove(r)) {
+                    size--;
+                    removed.add(r);
+                    list.remove(r);
+                }
             }
+            Assertions.assertFalse(table.remove(null));
+            Assertions.assertFalse(table.contains(null));
+            Assertions.assertEquals(size, table.size());
+            Assertions.assertEquals(list.size(), table.size());
+
+            for (Integer i: removed) Assertions.assertFalse(table.contains(i));
         }
-        Assertions.assertEquals(size, table.size());
-        Assertions.assertEquals(list.size(), table.size());
-        for (Integer i: list) Assertions.assertTrue(table.contains(i));
-        for (Integer i: removed) Assertions.assertFalse(table.contains(i));
     }
 
     public void iteratorTest(int elements, int bound) { //iterator : next, hasNext, remove
@@ -49,7 +54,7 @@ public class ClosedAddressingTest<T> {
         for (int i = 0; i < elements; i++) table.add(random.nextInt(bound));
         Iterator<Integer> iter1 = table.iterator();
         Iterator<Integer> iter2 = table.iterator();
-        //Assertions.assertThrows(IllegalStateException.class, iter1::remove);
+        Assertions.assertThrows(IllegalStateException.class, iter1::remove);
 
         while (iter1.hasNext()) Assertions.assertEquals(iter1.next(), iter2.next());
         Assertions.assertThrows(NoSuchElementException.class, iter1::next);
@@ -62,6 +67,13 @@ public class ClosedAddressingTest<T> {
         Assertions.assertThrows(IllegalStateException.class, iter3::remove);
         Assertions.assertFalse(table.contains(i));
         Assertions.assertEquals(size, table.size());
+    }
+
+    @Test
+    public void doMainMethodsTest() {
+        mainMethodsTest(10000, 1000, 10);
+        mainMethodsTest(100000, 1000, 5);
+        mainMethodsTest(1000000, 2000, 1);
     }
 
     @Test
