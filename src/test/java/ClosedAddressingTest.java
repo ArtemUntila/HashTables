@@ -3,7 +3,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
-public class ClosedAddressingTest<T> {
+public class ClosedAddressingTest {
 
     public void mainMethodsTest(int elements, int bound, int count) {
         Random random = new Random();
