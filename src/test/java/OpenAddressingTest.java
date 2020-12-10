@@ -62,6 +62,7 @@ public class OpenAddressingTest {
         Integer i = iter3.next();
         int size = table.size() - 1;
         iter3.remove();
+        Assertions.assertThrows(IllegalStateException.class, iter3::remove);
         Assertions.assertFalse(table.contains(i));
         Assertions.assertEquals(size, table.size());
     }

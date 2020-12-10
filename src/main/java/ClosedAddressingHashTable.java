@@ -1,7 +1,4 @@
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Set;
+import java.util.*;
 
 public class ClosedAddressingHashTable<T> implements Set<T> {
     public int capacity;
@@ -48,11 +45,6 @@ public class ClosedAddressingHashTable<T> implements Set<T> {
     public boolean contains(Object o) {
         LinkedList<T> current = storage[hash(o)];
         return current != null && current.contains(o);
-    }
-
-    @Override
-    public Iterator<T> iterator() {
-        return null;
     }
 
     @Override
@@ -126,5 +118,62 @@ public class ClosedAddressingHashTable<T> implements Set<T> {
     @Override
     public void clear() {
 
+    }
+
+    @Override
+    public Iterator<T> iterator() {
+        return new ClosedAddressingHashTableIterator();
+    }
+
+    private class ClosedAddressingHashTableIterator implements Iterator<T> {
+
+        private int iterations;
+
+        private T current;
+
+        private Iterator<T> iter;
+
+        private int index;
+
+        private LinkedList<T> currentList;
+
+        public ClosedAddressingHashTableIterator() {
+            current = null;
+            currentList = null;
+            iter = null;
+            iterations = 0;
+            index = 0;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return iterations < size;
+        }
+
+        @Override
+        public T next() {
+           if (hasNext()) {
+               if(iter == null || !iter.hasNext()) {
+                   while (currentList == null || currentList.isEmpty()) {
+                       index++;
+                       currentList = storage[index];
+                   }
+                   iter = currentList.iterator();
+               }
+               current = iter.next();
+               iterations++;
+               return current;
+           } else throw new NoSuchElementException();
+        }
+
+        @Override
+        public void remove() {
+            if (current != null) {
+                iter.remove();
+                current = null;
+                size--;
+                iterations--;
+            } else throw new IllegalStateException();
+        }
     }
 }
