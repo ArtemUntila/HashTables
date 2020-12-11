@@ -21,7 +21,7 @@ public class ClosedAddressingTest {
             Assertions.assertEquals(size, table.size());
             Assertions.assertEquals(list.size(), table.size());
 
-            for (Integer i: list) Assertions.assertTrue(table.contains(i));
+            for (Integer i : list) Assertions.assertTrue(table.contains(i));
 
             List<Integer> removed = new ArrayList<>();
             for (int i = 0; i < elements; i++) {
@@ -37,13 +37,13 @@ public class ClosedAddressingTest {
             Assertions.assertEquals(size, table.size());
             Assertions.assertEquals(list.size(), table.size());
 
-            for (Integer i: removed) Assertions.assertFalse(table.contains(i));
+            for (Integer i : removed) Assertions.assertFalse(table.contains(i));
         }
     }
 
     public void iteratorTest(int elements, int bound, int count) { //iterator : next, hasNext, remove
         Random random = new Random();
-        for(int k = 0; k < count; k++) {
+        for (int k = 0; k < count; k++) {
             ClosedAddressingHashTable<Integer> table = new ClosedAddressingHashTable<>();
             Iterator<Integer> iter = table.iterator();
             Assertions.assertFalse(iter.hasNext());
@@ -65,13 +65,22 @@ public class ClosedAddressingTest {
             Assertions.assertThrows(IllegalStateException.class, iter3::remove);
             Assertions.assertFalse(table.contains(i));
             Assertions.assertEquals(size, table.size());
+
+            while (iter3.hasNext()) {
+                Integer element = iter3.next();
+                iter3.remove();
+                Assertions.assertFalse(table.contains(element));
+                size--;
+                Assertions.assertEquals(size, table.size());
+            }
+            Assertions.assertTrue(table.isEmpty());
         }
     }
 
     public void additionalMethodsTest(int elements, int bound, int count) {
         // addAll, containsAll, removeAll, isEmpty, toArray
         Random random = new Random();
-        for (int k = 0; k < count; k ++) {
+        for (int k = 0; k < count; k++) {
             ClosedAddressingHashTable<Integer> table = new ClosedAddressingHashTable<>();
             List<Integer> list = new ArrayList<>();
             for (int i = 0; i < elements; i++) {
@@ -83,10 +92,10 @@ public class ClosedAddressingTest {
 
             Object[] array = table.toArray();
             Assertions.assertEquals(array.length, table.size());
-            for(Object o: array) Assertions.assertTrue(table.contains(o));
+            for (Object o : array) Assertions.assertTrue(table.contains(o));
 
             Assertions.assertTrue(table.removeAll(list));
-            for (Integer i: list) Assertions.assertFalse(table.contains(i));
+            for (Integer i : list) Assertions.assertFalse(table.contains(i));
             Assertions.assertTrue(table.isEmpty());
 
             Assertions.assertTrue(table.addAll(list));
@@ -94,24 +103,35 @@ public class ClosedAddressingTest {
             Assertions.assertTrue(table.isEmpty());
         }
     }
+
     @Test
     public void doMainMethodsTest() {
         mainMethodsTest(10000, 1000, 10);
         mainMethodsTest(100000, 1000, 5);
-        mainMethodsTest(1000000, 2000, 1);
+        mainMethodsTest(1000000, 1000, 1);
     }
 
     @Test
     public void doIteratorTest() {
         iteratorTest(10000, 1000, 10);
         iteratorTest(100000, 1000, 5);
-        iteratorTest(1000000, 2000, 1);
+        iteratorTest(1000000, 1000, 1);
     }
 
     @Test
     public void doAdditionalMethodsTest() {
         additionalMethodsTest(10000, 1000, 10);
         additionalMethodsTest(100000, 1000, 5);
-        additionalMethodsTest(1000000, 2000, 1);
+        additionalMethodsTest(1000000, 1000, 1);
+    }
+
+    @Test
+    public void retainTest() {
+        List<Integer> list = List.of(1);
+        OpenAddressingHashTable<Integer> table = new OpenAddressingHashTable<>();
+        table.add(1);
+        Assertions.assertFalse(table.retainAll(list));
+        table.add(2);
+        Assertions.assertTrue(table.retainAll(list));
     }
 }

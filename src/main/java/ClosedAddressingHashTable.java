@@ -12,7 +12,7 @@ public class ClosedAddressingHashTable<T> implements Set<T> {
 
     private int hash(Object element) {
         int code = element.hashCode();
-        if (code >= 0 ) return code % capacity;
+        if (code >= 0) return code % capacity;
         else return (capacity - 1) - (Math.abs(code) % capacity);
     }
 
@@ -22,8 +22,9 @@ public class ClosedAddressingHashTable<T> implements Set<T> {
         this.loadFactor = loadFactor;
         this.storage = new LinkedList[capacity];
     }
+
     public ClosedAddressingHashTable(int capacity) {
-        this(capacity, 0.75F);
+        this(capacity, 0.75f);
     }
 
     public ClosedAddressingHashTable(float loadFactor) {
@@ -31,7 +32,7 @@ public class ClosedAddressingHashTable<T> implements Set<T> {
     }
 
     public ClosedAddressingHashTable() {
-        this(16, 0.75F);
+        this(16, 0.75f);
     }
 
     public int size() {
@@ -56,8 +57,7 @@ public class ClosedAddressingHashTable<T> implements Set<T> {
         if (current == null) {
             storage[index] = new LinkedList<>();
             storage[index].add(t);
-        }
-        else if (!current.contains(t)) storage[index].add(t);
+        } else if (!current.contains(t)) storage[index].add(t);
         else return false;
         size++;
         return true;
@@ -69,13 +69,13 @@ public class ClosedAddressingHashTable<T> implements Set<T> {
         if (capacity <= 0) throw new IllegalStateException("Table capacity can't be more than max value of integer");
         LinkedList<T>[] oldStorage = storage;
         storage = new LinkedList[capacity];
-        for (LinkedList<T> list: oldStorage)
+        for (LinkedList<T> list : oldStorage)
             if (list != null)
                 for (T t : list) {
-                int index = hash(t);
-                if (storage[index] == null) storage[index] = new LinkedList<>();
-                storage[index].add(t);
-            }
+                    int index = hash(t);
+                    if (storage[index] == null) storage[index] = new LinkedList<>();
+                    storage[index].add(t);
+                }
     }
 
     public boolean remove(Object o) {
@@ -84,12 +84,12 @@ public class ClosedAddressingHashTable<T> implements Set<T> {
         if (storage[index] != null && storage[index].remove(o)) {
             size--;
             return true;
-        }
-        else return false;
+        } else return false;
     }
 
     @Override
     public boolean containsAll(Collection<?> c) {
+        Objects.requireNonNull(c);
         if (c.isEmpty()) return false;
         for (Object o : c)
             if (!contains(o)) return false;
@@ -98,6 +98,7 @@ public class ClosedAddressingHashTable<T> implements Set<T> {
 
     @Override
     public boolean addAll(Collection<? extends T> c) {
+        Objects.requireNonNull(c);
         boolean changed = false;
         if (!c.isEmpty())
             for (T t : c)
@@ -107,18 +108,29 @@ public class ClosedAddressingHashTable<T> implements Set<T> {
 
     @Override
     public boolean removeAll(Collection<?> c) {
+        Objects.requireNonNull(c);
         if (c.isEmpty()) return false;
         boolean changed = false;
         if (size > c.size())
             for (Object o : c)
                 changed = remove(o);
-        else changed = removeIf(c::contains); //use iterator()
+        else changed = removeIf(c::contains); //uses iterator()
         return changed;
     }
 
     @Override
     public boolean retainAll(Collection<?> c) {
-        return false;
+        Objects.requireNonNull(c);
+        if (c.isEmpty()) return false;
+        boolean changed = false;
+        Iterator<T> iter = iterator();
+        while (iter.hasNext()) {
+            if (!c.contains(iter.next())) {
+                iter.remove();
+                changed = true;
+            }
+        }
+        return changed;
     }
 
     @SuppressWarnings("unchecked")
@@ -152,23 +164,13 @@ public class ClosedAddressingHashTable<T> implements Set<T> {
 
     private class ClosedAddressingHashTableIterator implements Iterator<T> {
 
-        private int iterations;
+        private int iterations = 0;
 
-        private T current;
+        private T current = null;
 
-        private Iterator<T> iter;
+        private Iterator<T> iter = null;
 
-        private int index;
-
-        private LinkedList<T> currentList;
-
-        public ClosedAddressingHashTableIterator() {
-            current = null;
-            currentList = null;
-            iter = null;
-            iterations = 0;
-            index = -1;
-        }
+        private int index = 0;
 
         @Override
         public boolean hasNext() {
@@ -177,18 +179,17 @@ public class ClosedAddressingHashTable<T> implements Set<T> {
 
         @Override
         public T next() {
-           if (hasNext()) {
-               if(iter == null || !iter.hasNext()) {
-                   while (currentList == null || currentList.isEmpty()) {
-                       index++;
-                       currentList = storage[index];
-                   }
-                   iter = currentList.iterator();
-               }
-               current = iter.next();
-               iterations++;
-               return current;
-           } else throw new NoSuchElementException();
+            if (hasNext()) {
+                if (iter == null || !iter.hasNext()) {
+                    while (storage[index] == null || storage[index].isEmpty()) {
+                        index++;
+                    }
+                    iter = storage[index].iterator();
+                }
+                current = iter.next();
+                iterations++;
+                return current;
+            } else throw new NoSuchElementException();
         }
 
         @Override

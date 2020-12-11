@@ -1,8 +1,5 @@
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-import java.util.Set;
+import java.util.*;
 
 public class OpenAddressingHashTable<T> implements Set<T> {
 
@@ -29,7 +26,7 @@ public class OpenAddressingHashTable<T> implements Set<T> {
     }
 
     public OpenAddressingHashTable(int capacity) {
-        this(capacity, 0.75F);
+        this(capacity, 0.75f);
     }
 
     public OpenAddressingHashTable(float loadFactor) {
@@ -37,7 +34,7 @@ public class OpenAddressingHashTable<T> implements Set<T> {
     }
 
     public OpenAddressingHashTable() {
-        this(16, 0.75F);
+        this(16, 0.75f);
     }
 
     @Override
@@ -119,6 +116,7 @@ public class OpenAddressingHashTable<T> implements Set<T> {
 
     @Override
     public boolean containsAll(Collection<?> c) {
+        Objects.requireNonNull(c);
         if (c.isEmpty()) return false;
         for (Object o : c)
             if (!contains(o)) return false;
@@ -127,27 +125,39 @@ public class OpenAddressingHashTable<T> implements Set<T> {
 
     @Override
     public boolean addAll(Collection<? extends T> c) {
+        Objects.requireNonNull(c);
+        if (c.isEmpty()) return false;
         boolean changed = false;
-        if (!c.isEmpty())
-            for (T t : c)
-                if (t != null) changed = add(t);
+        for (T t : c)
+            if (t != null) changed = add(t);
         return changed;
     }
 
     @Override
     public boolean removeAll(Collection<?> c) {
-        if (c.isEmpty()) return false;
+        Objects.requireNonNull(c);
+        if (c.isEmpty() || isEmpty()) return false;
         boolean changed = false;
-        if (size > c.size())
+        if (size >= c.size())
             for (Object o : c)
                 changed = remove(o);
-        else changed = removeIf(c::contains); //use iterator()
+        else if (removeIf(c::contains)) changed = true; //uses iterator()
         return changed;
     }
 
     @Override
     public boolean retainAll(Collection<?> c) {
-        return false;
+        Objects.requireNonNull(c);
+        if (c.isEmpty()) return false;
+        boolean changed = false;
+        Iterator<T> iter = iterator();
+        while (iter.hasNext()) {
+            if (!c.contains(iter.next())) {
+                iter.remove();
+                changed = true;
+            }
+        }
+        return changed;
     }
 
     @SuppressWarnings("unchecked")
@@ -181,42 +191,32 @@ public class OpenAddressingHashTable<T> implements Set<T> {
 
     private class OpenAddressingHashTableIterator implements Iterator<T> {
 
-        private int index;
+        private int index = 0;
 
-        private int iterations;
+        private int iterations = 0;
 
-        private T current;
+        private T current = null;
 
-        public OpenAddressingHashTableIterator() {
-            index = -1;
-            iterations = 0;
-            current = null;
-        }
-
-        @Override
         public boolean hasNext() {
             return iterations < size;
         }
 
-        @Override
         public T next() {
             if (hasNext()) {
-                while (current == null || current == removed) {
-                    index++;
-                    current = storage[index];
-                }
+                while (storage[index] == null || storage[index] == removed) index++;
+                current = storage[index];
+                index++;
                 iterations++;
                 return current;
             } else throw new NoSuchElementException();
         }
 
-        @Override
         public void remove() {
-            if (current != null) {
-                storage[index] = removed;
+            if (current != null && current != removed) {
+                storage[index - 1] = removed;
                 current = null;
-                size--;
                 iterations--;
+                size--;
             } else throw new IllegalStateException();
         }
     }
