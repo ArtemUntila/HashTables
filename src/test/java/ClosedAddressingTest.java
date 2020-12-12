@@ -93,9 +93,9 @@ public class ClosedAddressingTest {
             Assertions.assertTrue(table.addAll(list));
             Assertions.assertTrue(table.containsAll(list));
 
-            Object[] array = table.toArray();
-            Assertions.assertEquals(array.length, table.size());
-            for (Object o : array) Assertions.assertTrue(table.contains(o));
+            Integer[] array = table.toArray(new Integer[table.size() + 1000]);
+            Assertions.assertEquals((array.length - 1000), table.size());
+            for (Integer i : array) if (i != null) Assertions.assertTrue(table.contains(i));
 
             Assertions.assertTrue(table.removeAll(list));
             for (Integer i : list) Assertions.assertFalse(table.contains(i));

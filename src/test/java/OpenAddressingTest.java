@@ -96,9 +96,7 @@ public class OpenAddressingTest {
 
             Integer[] array = table.toArray(new Integer[table.size() + 1000]);
             Assertions.assertEquals((array.length - 1000), table.size());
-            for (Integer o : array) {
-                if (o != null) Assertions.assertTrue(table.contains(o));
-            }
+            for (Integer i : array) if (i != null) Assertions.assertTrue(table.contains(i));
 
             Assertions.assertTrue(table.removeAll(list));
             for (Integer i : list) Assertions.assertFalse(table.contains(i));
