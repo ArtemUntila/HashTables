@@ -179,9 +179,13 @@ public class OpenAddressingHashTable<T> implements Set<T> {
         return array;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T1> T1[] toArray(T1[] a) {
-        return null;
+        if (a.length < size)
+            return (T1[]) Arrays.copyOf(toArray(), size, a.getClass());
+        System.arraycopy(toArray(), 0, a, 0, size);
+        return a;
     }
 
     @Override

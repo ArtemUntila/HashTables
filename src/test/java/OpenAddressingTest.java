@@ -55,7 +55,10 @@ public class OpenAddressingTest {
             Iterator<Integer> iter2 = table.iterator();
             Assertions.assertThrows(IllegalStateException.class, iter1::remove);
 
-            while (iter1.hasNext()) Assertions.assertEquals(iter1.next(), iter2.next());
+            List<Integer> list = new ArrayList<>(table);
+            Iterator<Integer> listIter = list.iterator();
+            while (iter1.hasNext()) Assertions.assertEquals(iter1.next(), iter2.next(), listIter.next());
+            Assertions.assertThrows(NoSuchElementException.class, listIter::next);
             Assertions.assertThrows(NoSuchElementException.class, iter1::next);
             Assertions.assertThrows(NoSuchElementException.class, iter2::next);
 
@@ -91,9 +94,11 @@ public class OpenAddressingTest {
             Assertions.assertTrue(table.addAll(list));
             Assertions.assertTrue(table.containsAll(list));
 
-            Object[] array = table.toArray();
-            Assertions.assertEquals(array.length, table.size());
-            for (Object o : array) Assertions.assertTrue(table.contains(o));
+            Integer[] array = table.toArray(new Integer[table.size() + 1000]);
+            Assertions.assertEquals((array.length - 1000), table.size());
+            for (Integer o : array) {
+                if (o != null) Assertions.assertTrue(table.contains(o));
+            }
 
             Assertions.assertTrue(table.removeAll(list));
             for (Integer i : list) Assertions.assertFalse(table.contains(i));
@@ -127,12 +132,14 @@ public class OpenAddressingTest {
     }
 
     @Test
-    public void retainTest() {
-        List<Integer> list = List.of(1);
+    public void retainAllTest() { // retainAll
+        List<Integer> list = List.of(0, 1, 2, 3, 4, 5, 6, 7);
         OpenAddressingHashTable<Integer> table = new OpenAddressingHashTable<>();
-        table.add(1);
+        table.addAll(list);
         Assertions.assertFalse(table.retainAll(list));
-        table.add(2);
+        table.add(8);
+        Assertions.assertEquals(9, table.size());
         Assertions.assertTrue(table.retainAll(list));
+        Assertions.assertEquals(list.size(), table.size());
     }
 }

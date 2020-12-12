@@ -168,9 +168,9 @@ public class ClosedAddressingHashTable<T> implements Set<T> {
 
         private T current = null;
 
-        private Iterator<T> iter = null;
+        private int index = -1;
 
-        private int index = 0;
+        private Iterator<T> iter = null;
 
         @Override
         public boolean hasNext() {
@@ -181,6 +181,7 @@ public class ClosedAddressingHashTable<T> implements Set<T> {
         public T next() {
             if (hasNext()) {
                 if (iter == null || !iter.hasNext()) {
+                    index++;
                     while (storage[index] == null || storage[index].isEmpty()) {
                         index++;
                     }

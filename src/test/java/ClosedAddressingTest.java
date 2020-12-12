@@ -54,7 +54,10 @@ public class ClosedAddressingTest {
             Iterator<Integer> iter2 = table.iterator();
             Assertions.assertThrows(IllegalStateException.class, iter1::remove);
 
-            while (iter1.hasNext()) Assertions.assertEquals(iter1.next(), iter2.next());
+            List<Integer> list = new ArrayList<>(table);
+            Iterator<Integer> listIter = list.iterator();
+            while (iter1.hasNext()) Assertions.assertEquals(iter1.next(), iter2.next(), listIter.next());
+            Assertions.assertThrows(NoSuchElementException.class, listIter::next);
             Assertions.assertThrows(NoSuchElementException.class, iter1::next);
             Assertions.assertThrows(NoSuchElementException.class, iter2::next);
 
@@ -126,12 +129,14 @@ public class ClosedAddressingTest {
     }
 
     @Test
-    public void retainTest() {
-        List<Integer> list = List.of(1);
+    public void retainAllTest() { // retainAll
+        List<Integer> list = List.of(0, 1, 2, 3, 4, 5, 6, 7);
         OpenAddressingHashTable<Integer> table = new OpenAddressingHashTable<>();
-        table.add(1);
+        table.addAll(list);
         Assertions.assertFalse(table.retainAll(list));
-        table.add(2);
+        table.add(8);
+        Assertions.assertEquals(9, table.size());
         Assertions.assertTrue(table.retainAll(list));
+        Assertions.assertEquals(list.size(), table.size());
     }
 }
