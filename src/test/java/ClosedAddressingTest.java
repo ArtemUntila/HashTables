@@ -1,5 +1,6 @@
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import tables.ClosedAddressingHashTable;
 
 import java.util.*;
 import static io.qala.datagen.RandomValue.between;
@@ -106,6 +107,7 @@ public class ClosedAddressingTest {
             Assertions.assertTrue(table.addAll(list));
             table.clear();
             Assertions.assertTrue(table.isEmpty());
+            for (Integer i : list) Assertions.assertFalse(table.contains(i));
         }
     }
 
@@ -133,7 +135,7 @@ public class ClosedAddressingTest {
     @Test
     public void retainAllTest() { // retainAll
         List<Integer> list = List.of(0, 1, 2, 3, 4, 5, 6, 7);
-        OpenAddressingHashTable<Integer> table = new OpenAddressingHashTable<>();
+        ClosedAddressingHashTable<Integer> table = new ClosedAddressingHashTable<>();
         table.addAll(list);
         Assertions.assertFalse(table.retainAll(list));
         table.add(8);

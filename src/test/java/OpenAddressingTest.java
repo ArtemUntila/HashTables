@@ -1,6 +1,7 @@
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import tables.OpenAddressingHashTable;
 
 import java.util.*;
 import static io.qala.datagen.RandomValue.between;
@@ -108,6 +109,7 @@ public class OpenAddressingTest {
             Assertions.assertTrue(table.addAll(list));
             table.clear();
             Assertions.assertTrue(table.isEmpty());
+            for (Integer i : list) Assertions.assertFalse(table.contains(i));
         }
     }
 

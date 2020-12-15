@@ -1,3 +1,4 @@
+package tables;
 
 import java.util.*;
 
@@ -195,7 +196,7 @@ public class OpenAddressingHashTable<T> implements Set<T> {
 
     private class OpenAddressingHashTableIterator implements Iterator<T> {
 
-        private int index = 0;
+        private int index = -1;
 
         private int iterations = 0;
 
@@ -207,9 +208,9 @@ public class OpenAddressingHashTable<T> implements Set<T> {
 
         public T next() {
             if (hasNext()) {
+                index++;
                 while (storage[index] == null || storage[index] == removed) index++;
                 current = storage[index];
-                index++;
                 iterations++;
                 return current;
             } else throw new NoSuchElementException();
@@ -217,7 +218,7 @@ public class OpenAddressingHashTable<T> implements Set<T> {
 
         public void remove() {
             if (current != null && current != removed) {
-                storage[index - 1] = removed;
+                storage[index] = removed;
                 current = null;
                 iterations--;
                 size--;
