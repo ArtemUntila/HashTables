@@ -3,17 +3,18 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
+import static io.qala.datagen.RandomValue.between;
+
 
 public class OpenAddressingTest {
 
     public void mainMethodsTest(int elements, int bound, int count) { //add, remove, contains, size
-        Random random = new Random();
         for (int k = 0; k < count; k++) {
             OpenAddressingHashTable<Integer> table = new OpenAddressingHashTable<>();
             int size = 0;
             List<Integer> added = new ArrayList<>();
             for (int i = 0; i < elements; i++) {
-                Integer r = random.nextInt(bound);
+                Integer r = between(-bound, bound).integer();
                 if (table.add(r)) {
                     added.add(r);
                     size++;
@@ -26,7 +27,7 @@ public class OpenAddressingTest {
 
             List<Integer> removed = new ArrayList<>();
             for (int i = 0; i < elements; i++) {
-                Integer r = random.nextInt(bound);
+                Integer r = between(-bound, bound).integer();
                 if (table.remove(r)) {
                     size--;
                     removed.add(r);
@@ -43,21 +44,24 @@ public class OpenAddressingTest {
     }
 
     public void iteratorTest(int elements, int bound, int count) { //iterator : next, hasNext, remove
-        Random random = new Random();
         for (int k = 0; k < count; k++) {
             OpenAddressingHashTable<Integer> table = new OpenAddressingHashTable<>();
             Iterator<Integer> iter = table.iterator();
             Assertions.assertFalse(iter.hasNext());
             Assertions.assertThrows(NoSuchElementException.class, iter::next);
 
-            for (int i = 0; i < elements; i++) table.add(random.nextInt(bound));
+            for (int i = 0; i < elements; i++) table.add(between(-bound, bound).integer());
             Iterator<Integer> iter1 = table.iterator();
             Iterator<Integer> iter2 = table.iterator();
             Assertions.assertThrows(IllegalStateException.class, iter1::remove);
 
             List<Integer> list = new ArrayList<>(table);
             Iterator<Integer> listIter = list.iterator();
-            while (iter1.hasNext()) Assertions.assertEquals(iter1.next(), iter2.next(), listIter.next());
+            while (iter1.hasNext()) {
+                Integer value = iter1.next();
+                Assertions.assertEquals(value, iter2.next());
+                Assertions.assertEquals(value, listIter.next());
+            }
             Assertions.assertThrows(NoSuchElementException.class, listIter::next);
             Assertions.assertThrows(NoSuchElementException.class, iter1::next);
             Assertions.assertThrows(NoSuchElementException.class, iter2::next);
@@ -83,12 +87,11 @@ public class OpenAddressingTest {
 
     public void additionalMethodsTest(int elements, int bound, int count) {
         // addAll, containsAll, removeAll, isEmpty, toArray
-        Random random = new Random();
         for (int k = 0; k < count; k++) {
             OpenAddressingHashTable<Integer> table = new OpenAddressingHashTable<>();
             List<Integer> list = new ArrayList<>();
             for (int i = 0; i < elements; i++) {
-                int r = random.nextInt(bound);
+                Integer r = between(-bound, bound).integer();
                 if (!list.contains(r)) list.add(r);
             }
             Assertions.assertTrue(table.addAll(list));
@@ -110,23 +113,23 @@ public class OpenAddressingTest {
 
     @Test
     public void doMainMethodsTest() {
-        mainMethodsTest(10000, 1000, 10);
-        mainMethodsTest(100000, 1000, 5);
-        mainMethodsTest(1000000, 1000, 1);
+        mainMethodsTest(10000, 500, 10);
+        mainMethodsTest(100000, 500, 5);
+        mainMethodsTest(1000000, 500, 1);
     }
 
     @Test
     public void doIteratorTest() {
-        iteratorTest(10000, 1000, 10);
-        iteratorTest(100000, 1000, 5);
-        iteratorTest(1000000, 1000, 1);
+        iteratorTest(10000, 500, 10);
+        iteratorTest(100000, 500, 5);
+        iteratorTest(1000000, 500, 1);
     }
 
     @Test
     public void doAdditionalMethodsTest() {
-        additionalMethodsTest(10000, 1000, 10);
-        additionalMethodsTest(100000, 1000, 5);
-        additionalMethodsTest(1000000, 1000, 1);
+        additionalMethodsTest(10000, 500, 10);
+        additionalMethodsTest(100000, 500, 5);
+        additionalMethodsTest(1000000, 500, 1);
     }
 
     @Test
