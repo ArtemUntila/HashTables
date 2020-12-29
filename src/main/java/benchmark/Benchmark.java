@@ -37,8 +37,9 @@ public class Benchmark {
     }
 
     @org.openjdk.jmh.annotations.Benchmark
-    public static void openAddBench() {
+    public static void openAddBench(Blackhole bh) {
         for (int i = 0; i < size; i++) openTable.add(i);
+        bh.consume(openTable);
     }
 
     @org.openjdk.jmh.annotations.Benchmark
@@ -48,16 +49,19 @@ public class Benchmark {
             Integer i = iterator.next();
             bh.consume(i);
         }
+        bh.consume(openTable);
     }
 
     @org.openjdk.jmh.annotations.Benchmark
-    public void openRemoveBench() {
+    public void openRemoveBench(Blackhole bh) {
         for (int i = 0; i < size; i++) openTable.remove(i);
+        bh.consume(openTable);
     }
 
     @org.openjdk.jmh.annotations.Benchmark
-    public static void closedAddBench() {
+    public static void closedAddBench(Blackhole bh) {
         for (int i = 0; i < size; i++) closedTable.add(i);
+        bh.consume(closedTable);
     }
 
     @org.openjdk.jmh.annotations.Benchmark
@@ -67,16 +71,19 @@ public class Benchmark {
             Integer i = iterator.next();
             bh.consume(i);
         }
+        bh.consume(closedTable);
     }
 
     @org.openjdk.jmh.annotations.Benchmark
-    public void closedRemoveBench() {
+    public void closedRemoveBench(Blackhole bh) {
         for (int i = 0; i < size; i++) closedTable.remove(i);
+        bh.consume(closedTable);
     }
 
     @org.openjdk.jmh.annotations.Benchmark
-    public static void setAddBench() {
+    public static void setAddBench(Blackhole bh) {
         for (int i = 0; i < size; i++) set.add(i);
+        bh.consume(set);
     }
 
     @org.openjdk.jmh.annotations.Benchmark
@@ -86,11 +93,13 @@ public class Benchmark {
             Integer i = iterator.next();
             bh.consume(i);
         }
+        bh.consume(set);
     }
 
     @org.openjdk.jmh.annotations.Benchmark
-    public void setRemoveBench() {
+    public void setRemoveBench(Blackhole bh) {
         for (int i = 0; i < size; i++) set.remove(i);
+        bh.consume(set);
     }
 
 }

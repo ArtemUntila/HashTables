@@ -87,7 +87,7 @@ public class OpenAddressingTest {
     }
 
     public void additionalMethodsTest(int elements, int bound, int count) {
-        // addAll, containsAll, removeAll, isEmpty, toArray
+        // addAll, containsAll, removeAll, isEmpty, toArray, clear
         for (int k = 0; k < count; k++) {
             OpenAddressingHashTable<Integer> table = new OpenAddressingHashTable<>();
             List<Integer> list = new ArrayList<>();

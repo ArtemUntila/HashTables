@@ -13,6 +13,7 @@ public class ClosedAddressingHashTable<T> implements Set<T> {
     private int size = 0;
 
     private int hash(Object element) {
+        Objects.requireNonNull(element);
         int code = element.hashCode();
         if (code >= 0) return code % capacity;
         else return (capacity - 1) - (Math.abs(code) % capacity);
@@ -53,7 +54,7 @@ public class ClosedAddressingHashTable<T> implements Set<T> {
     }
 
     public boolean add(T t) {
-        if (size == (int) (capacity * loadFactor)) resize();
+        if (size >= (int) (capacity * loadFactor)) resize();
         int index = hash(t);
         LinkedList<T> current = storage[index];
         if (current == null) {
@@ -71,13 +72,15 @@ public class ClosedAddressingHashTable<T> implements Set<T> {
         if (capacity <= 0) throw new IllegalStateException("Table capacity can't be more than max value of integer");
         LinkedList<T>[] oldStorage = storage;
         storage = new LinkedList[capacity];
-        for (LinkedList<T> list : oldStorage)
-            if (list != null)
+        for (LinkedList<T> list : oldStorage) {
+            if (list != null) {
                 for (T t : list) {
                     int index = hash(t);
                     if (storage[index] == null) storage[index] = new LinkedList<>();
                     storage[index].add(t);
                 }
+            }
+        }
     }
 
     public boolean remove(Object o) {
@@ -102,9 +105,10 @@ public class ClosedAddressingHashTable<T> implements Set<T> {
     public boolean addAll(Collection<? extends T> c) {
         Objects.requireNonNull(c);
         boolean changed = false;
-        if (!c.isEmpty())
+        if (!c.isEmpty()) {
             for (T t : c)
                 if (t != null) changed = add(t);
+        }
         return changed;
     }
 
@@ -113,10 +117,9 @@ public class ClosedAddressingHashTable<T> implements Set<T> {
         Objects.requireNonNull(c);
         if (c.isEmpty()) return false;
         boolean changed = false;
-        if (size > c.size())
-            for (Object o : c)
-                changed = remove(o);
-        else changed = removeIf(c::contains); //uses iterator()
+        if (size > c.size()) {
+            for (Object o : c) changed = remove(o);
+        } else changed = removeIf(c::contains); //uses iterator()
         return changed;
     }
 
@@ -126,12 +129,11 @@ public class ClosedAddressingHashTable<T> implements Set<T> {
         if (c.isEmpty()) return false;
         boolean changed = false;
         Iterator<T> iter = iterator();
-        while (iter.hasNext()) {
+        while (iter.hasNext())
             if (!c.contains(iter.next())) {
                 iter.remove();
                 changed = true;
             }
-        }
         return changed;
     }
 
@@ -157,8 +159,7 @@ public class ClosedAddressingHashTable<T> implements Set<T> {
     @SuppressWarnings("unchecked")
     @Override
     public <T1> T1[] toArray(T1[] a) {
-        if (a.length < size)
-            return (T1[]) Arrays.copyOf(toArray(), size, a.getClass());
+        if (a.length < size) return (T1[]) Arrays.copyOf(toArray(), size, a.getClass());
         System.arraycopy(toArray(), 0, a, 0, size);
         return a;
     }

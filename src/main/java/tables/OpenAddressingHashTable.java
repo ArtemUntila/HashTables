@@ -13,6 +13,7 @@ public class OpenAddressingHashTable<T> implements Set<T> {
     private int size = 0;
 
     private int hash(Object element) {
+        Objects.requireNonNull(element);
         int code = element.hashCode();
         if (code >= 0) return code % capacity;
         else return (capacity - 1) - (Math.abs(code) % capacity);
@@ -65,7 +66,7 @@ public class OpenAddressingHashTable<T> implements Set<T> {
 
     @Override
     public boolean add(T t) {
-        if (size == (int) (capacity * loadFactor)) resize();
+        if (size >= (int) (capacity * loadFactor)) resize();
         int index = hash(t);
         T current = storage[index];
         while (current != null && current != removed) {
@@ -139,10 +140,10 @@ public class OpenAddressingHashTable<T> implements Set<T> {
         Objects.requireNonNull(c);
         if (c.isEmpty() || isEmpty()) return false;
         boolean changed = false;
-        if (size >= c.size())
+        if (size >= c.size()) {
             for (Object o : c)
                 changed = remove(o);
-        else if (removeIf(c::contains)) changed = true; //uses iterator()
+        } else if (removeIf(c::contains)) changed = true; //uses iterator()
         return changed;
     }
 

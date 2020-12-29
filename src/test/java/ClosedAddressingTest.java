@@ -85,7 +85,7 @@ public class ClosedAddressingTest {
     }
 
     public void additionalMethodsTest(int elements, int bound, int count) {
-        // addAll, containsAll, removeAll, isEmpty, toArray
+        // addAll, containsAll, removeAll, isEmpty, toArray, clear
         for (int k = 0; k < count; k++) {
             ClosedAddressingHashTable<Integer> table = new ClosedAddressingHashTable<>();
             List<Integer> list = new ArrayList<>();
